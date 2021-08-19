@@ -62,9 +62,10 @@ mem_open(void)
 	//munmap(map_base, map_size);
 	//close(fd);
 
-	//*(volatile uint32_t *)(map_base + 0x40) = 0x80000003;
-	//sleep(1);
-	//*(volatile uint32_t *)(map_base + 0x40) = 0x80000001;
+	/* Reset */
+	*(volatile uint32_t *)(map_base + 0x10) = 0x80000003;
+	sleep(1);
+	*(volatile uint32_t *)(map_base + 0x10) = 0x80000001;
 }
 
 void
