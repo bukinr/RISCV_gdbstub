@@ -85,9 +85,11 @@ uint32_t poll_dmstatus (char      *dbg_string,
 {
     uint32_t usecs = 0;
 
+	printf("waiting for mask %x val %x at %x\n", mask, value, dm_addr_dmstatus);
     while (true) {
 	// Timeout
 	if (usecs >= 1000000) {
+		printf("timeout\n");
 	    if (logfile_fp != NULL) {
 	      fprintf (logfile_fp,
 		       "    %s: polled dmstatus %0d usecs; mask 0x%0x, value 0x%0x; timeout\n",
@@ -98,6 +100,7 @@ uint32_t poll_dmstatus (char      *dbg_string,
 	*p_dmstatus = dmi_read (dm_addr_dmstatus);
 
 	if ((*p_dmstatus & mask) == value) {
+		printf("wait success\n");
 	    return status_ok;
 	}
 

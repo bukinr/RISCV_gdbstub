@@ -1534,9 +1534,11 @@ void *main_gdbstub (void *arg)
     gdb_fd  = params->gdb_fd;
     stop_fd = params->stop_fd;
 
+printf("%s: 1\n", __func__);
     if (logfile) {
 	fprintf (logfile, "main_gdbstub: for RV%0d\n", gdbstub_be_xlen);
     }
+printf("%s: 2\n", __func__);
     if ((gdbstub_be_xlen != 32) && (gdbstub_be_xlen != 64)) {
 	if (logfile) {
 	    fprintf (logfile, "ERROR: gdbstub_fe.main_gdbstub: invalid RVnn; nn should be 32 or 64 only\n");
@@ -1557,6 +1559,7 @@ void *main_gdbstub (void *arg)
 	if (logfile) {
 	    fprintf (logfile, "ERROR: gdbstub_fe.main_gdbstub: error in gdbstub_be_startup\n");
 	}
+	printf("goto done1\n");
 	goto done;
     }
 
@@ -1566,6 +1569,7 @@ void *main_gdbstub (void *arg)
 	if (logfile) {
 	    fprintf (logfile, "ERROR: gdbstub_fe.main_gdbstub: Expecting initial '+', but received %c from GDB\n", ch);
 	}
+	printf("goto done2\n");
 	goto done;
     }
 
@@ -1678,7 +1682,9 @@ void *main_gdbstub (void *arg)
         }
     }
 
+	printf("done 0\n");
 done:
+	printf("done\n");
     if (params->autoclose_logfile_stop_fd) {
 	if (logfile) {
 	    fclose (logfile);
