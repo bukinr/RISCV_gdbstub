@@ -337,6 +337,7 @@ char recv_ack_nak (void)
     char ack_char;
     while (true) {
 	ssize_t n = read (gdb_fd, & ack_char, 1);
+	//printf("%s: n is %ld, errno %d\n", __func__, n, errno);
 	if (n < 0) {
 	    if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) {
 		// Nothing available yet

@@ -79,8 +79,8 @@ dmi_write(uint16_t addr, uint32_t data)
 	}
 
 	if (addr == 0x10) {
-		data1 = 0x00000003;
-		printf("%s: addr %x: data %x\n", __func__, addr, data1);
+		//data1 = 0x00000003;
+		//printf("%s: addr %x: data %x\n", __func__, addr, data1);
 		//*(volatile uint32_t *)(map_base + addr) = data1;
 	}
 
@@ -101,7 +101,7 @@ dmi_read(uint16_t addr)
 	reg = *(volatile uint32_t *)(map_base + addr);
 
 	//if (reg != 0 && addr != 0x11)
-	//	printf("%s: addr %x, val %x\n", __func__, addr, reg);
+	printf("%s: addr %x, val %x\n", __func__, addr, reg);
 
 	return (reg);
 }
