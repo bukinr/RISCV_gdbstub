@@ -28,64 +28,82 @@
 // These should be filled in with the appropriate mechanisms that
 // perform the actual DMI read/write on the RISC-V Debug module.
 
-static uint32_t *map_base;
+#include <sys/types.h>
+#include <sys/ioctl.h>
+
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+struct fmem_request {
+	uint32_t addr;
+	uint32_t data;
+	uint32_t access_width;
+};
+
+#define	FMEM_READ	_IOWR('X', 1, struct fmem_request)
+#define	FMEM_WRITE	_IOWR('X', 2, struct fmem_request)
+
 static int fd;
 static int opened = 0;
 
-static void
-mem_open(void)
+static int
+fmem_read(uint32_t offset)
 {
-	uint64_t map_size;
-	uint64_t target;
-	int reg;
+        struct fmem_request req;
+        int error;
 
-	printf("%s\n", __func__);
+	req.addr = 0xf9000000 + offset;
+	req.access_width = 4;
 
-	fd = open("/dev/mem", O_RDWR | O_SYNC);
+        error = ioctl(fd, FMEM_READ, &req);
 
-	map_size = 4096;
-	target = 0xf9000000;
+        if (error == 0)
+		return (req.data);
 
-	map_base = mmap(0, map_size, PROT_READ | PROT_WRITE,
-	    MAP_SHARED, fd, target);
+        return (0);
+}
 
-	printf("%s: map_base %p\n", __func__, map_base);
+static int
+fmem_write(uint32_t offset, uint32_t data)
+{
+        struct fmem_request req;
+        int error;
 
-	//fflush(stdout);
-	//*(volatile uint8_t *)(map_base) = 11;
+        req.addr = 0xf9000000 + offset;
+        req.data = data;
+	req.access_width = 4;
 
-	//printf("%s: trying to access reg...\n", __func__);
+        error = ioctl(fd, FMEM_WRITE, &req);
 
-	//reg = *(volatile uint32_t *)(map_base + 0x10);
-	//printf("%s: reg %x\n", __func__, reg);
+        return (error);
+}
 
-	//munmap(map_base, map_size);
-	//close(fd);
+static void
+fmem_open(void)
+{
 
-	/* Reset */
-	*(volatile uint32_t *)(map_base + 0x10) = 0x80000003;
+	fd = open("/dev/fmem", O_RDWR);
+
+        /* Reset */
+	fmem_write(0x10 * 4, 0x80000003);
 	sleep(1);
-	*(volatile uint32_t *)(map_base + 0x10) = 0x80000001;
+	fmem_write(0x10 * 4, 0x80000001);
 }
 
 void
 dmi_write(uint16_t addr, uint32_t data)
 {
-	uint32_t data1;
 
-	if (!opened) {
+	if (opened == 0) {
+		fmem_open();
 		opened = 1;
-		mem_open();
-	}
-
-	if (addr == 0x10) {
-		//data1 = 0x00000003;
-		//printf("%s: addr %x: data %x\n", __func__, addr, data1);
-		//*(volatile uint32_t *)(map_base + addr) = data1;
 	}
 
 	printf("%s: addr %x: data %x\n", __func__, addr, data);
-	*(volatile uint32_t *)(map_base + addr) = data;
+	fflush(stdout);
+
+	fmem_write(addr * 4, data);
 }
 
 uint32_t
@@ -93,15 +111,14 @@ dmi_read(uint16_t addr)
 {
 	uint32_t reg;
 
-	if (!opened) {
+	if (opened == 0) {
+		fmem_open();
 		opened = 1;
-		mem_open();
 	}
 
-	reg = *(volatile uint32_t *)(map_base + addr);
-
-	//if (reg != 0 && addr != 0x11)
 	printf("%s: addr %x, val %x\n", __func__, addr, reg);
+	fflush(stdout);
+	reg = fmem_read(addr * 4);
 
 	return (reg);
 }
