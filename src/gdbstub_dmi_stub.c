@@ -36,7 +36,7 @@
 #include <fcntl.h>
 
 struct fmem_request {
-	uint32_t addr;
+	uint32_t offset;
 	uint32_t data;
 	uint32_t access_width;
 };
@@ -53,7 +53,7 @@ fmem_read(uint32_t offset)
         struct fmem_request req;
         int error;
 
-	req.addr = 0xf9000000 + offset;
+	req.offset = offset;
 	req.access_width = 4;
 
         error = ioctl(fd, FMEM_READ, &req);
@@ -67,23 +67,23 @@ fmem_read(uint32_t offset)
 static int
 fmem_write(uint32_t offset, uint32_t data)
 {
-        struct fmem_request req;
-        int error;
+	struct fmem_request req;
+	int error;
 
-        req.addr = 0xf9000000 + offset;
-        req.data = data;
+	req.offset = offset;
+	req.data = data;
 	req.access_width = 4;
 
-        error = ioctl(fd, FMEM_WRITE, &req);
+	error = ioctl(fd, FMEM_WRITE, &req);
 
-        return (error);
+	return (error);
 }
 
 static void
 fmem_open(void)
 {
 
-	fd = open("/dev/fmem", O_RDWR);
+	fd = open("/dev/fmem0", O_RDWR);
 
         /* Reset */
 	fmem_write(0x10 * 4, 0x80000003);
