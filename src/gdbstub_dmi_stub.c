@@ -8,6 +8,8 @@
 // C lib includes
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -82,8 +84,13 @@ fmem_write(uint32_t offset, uint32_t data)
 static void
 fmem_open(void)
 {
-
-	fd = open("/dev/fmem0", O_RDWR);
+	char* fmemdev = getenv("RISCV_GDB_STUB_FMEM_DEV");
+	char filename[256] = "/dev/fmem_sys0_debug_unit";
+	if (fmemdev) {
+		strncpy(filename, fmemdev, 255);
+		filename[255] = '\0';
+	}
+	fd = open(filename, O_RDWR);
 
         /* Reset */
 	fmem_write(0x10 * 4, 0x80000003);
