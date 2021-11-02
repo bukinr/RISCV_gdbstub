@@ -1,9 +1,9 @@
 all:
-	cc -c Elf_read.c
-	cc -c gdbstub_be.c
-	cc -c main.c
-	cc -c RVDM.c
-	cc -c gdbstub_dmi_stub.c
-	cc -c gdbstub.c
-	cc -c gdbstub_fe.c
-	cc *o -lelf -lpthread -o main
+	$(CC) -c Elf_read.c
+	$(CC) -c gdbstub_be.c
+	$(CC) -c main.c
+	$(CC) -c RVDM.c
+	$(CC) -c gdbstub_dmi_stub.c
+	$(CC) -c gdbstub.c
+	$(CC) -c gdbstub_fe.c
+	$(CC) *o -lelf -lpthread -o main
