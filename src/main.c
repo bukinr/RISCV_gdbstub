@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <fcntl.h>
 #include <sys/socket.h>
@@ -34,6 +35,8 @@ int main (int argc, char **argv)
 
 	nonblocking = 0;
 	port = 81;
+	char* envport = getenv("RISCV_GDB_STUB_PORT");
+	if (envport) port = atoi (envport);
 
 	ret = fcntl(fd, F_GETFL, 0);
 	fcntl(fd, F_SETFL, nonblocking ? (ret | O_NONBLOCK) :
