@@ -107,8 +107,8 @@ dmi_write(uint16_t addr, uint32_t data)
 		opened = 1;
 	}
 
-	printf("%s: addr %x: data %x\n", __func__, addr, data);
-	fflush(stdout);
+	//printf("%s: addr %x: data %x\n", __func__, addr, data);
+	//fflush(stdout);
 
 	fmem_write(addr * 4, data);
 }
@@ -123,8 +123,8 @@ dmi_read(uint16_t addr)
 		opened = 1;
 	}
 
-	printf("%s: addr %x, val %x\n", __func__, addr, reg);
-	fflush(stdout);
+	//printf("%s: addr %x, val %x\n", __func__, addr, reg);
+	//fflush(stdout);
 	reg = fmem_read(addr * 4);
 
 	return (reg);
